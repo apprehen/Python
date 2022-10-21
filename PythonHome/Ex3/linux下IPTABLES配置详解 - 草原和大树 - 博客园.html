@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<!-- saved from url=(0061)http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html -->
+<html lang="zh-cn" class="gr__cnblogs_com"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>linux下IPTABLES配置详解 - 草原和大树 - 博客园</title>
+<link type="text/css" rel="stylesheet" href="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/bundle-sea.css">
+<link id="mobile-style" media="only screen and (max-width: 768px)" type="text/css" rel="stylesheet" href="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/bundle-sea-mobile.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/JemBai/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/JemBai/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/JemBai/wlwmanifest.xml">
+<script src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/jquery.js.下载" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'JemBai', cb_enable_mathjax=false;var isLogined=false;</script>
+<script src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/blog-common.js.下载" type="text/javascript"></script>
+</head>
+<body data-gr-c-s-loaded="true" data-feedly-mini="yes">
+<a name="top"></a>
+
+<!--done-->
+<div id="header">
+	
+<!--done-->
+<div class="header">
+	<div class="headerText">
+		<a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/JemBai/">草原和大树</a><br>
+		没落的帝王向往草原大树的生活
+	</div>
+</div>
+
+</div>
+
+<div id="mytopmenu">
+	
+		<div id="mylinks"><a id="blog_nav_sitehome" class="menu" href="http://www.cnblogs.com/">博客园</a> &nbsp;
+<a id="blog_nav_myhome" class="menu" href="http://www.cnblogs.com/JemBai/">首页</a> &nbsp;
+<a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a> &nbsp;
+<a id="blog_nav_contact" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/%E8%8D%89%E5%8E%9F%E5%92%8C%E5%A4%A7%E6%A0%91">联系</a> &nbsp;
+<a id="blog_nav_rss" class="menu" href="http://www.cnblogs.com/JemBai/rss">订阅</a><a id="blog_nav_rss_image" href="http://www.cnblogs.com/JemBai/rss"><img src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/xml.gif" alt="订阅"></a>&nbsp;
+<a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a>
+</div>
+		<div id="mystats"><div id="blog_stats">
+随笔-682&nbsp;
+评论-255&nbsp;
+文章-3&nbsp;
+<!--trackbacks-5-->
+</div></div>
+	
+</div>
+<div id="centercontent">
+	
+<div id="post_detail">
+<div class="post">
+	<h1 class="postTitle"><a id="cb_post_title_url" class="postTitle2" href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html">linux下IPTABLES配置详解</a></h1>
+	<div id="cnblogs_post_body"><div><strong>如果你的IPTABLES基础知识还不了解,建议先去看看.</strong></div>
+<div><strong>开始配置</strong></div>
+<div><strong>我们来配置一个filter表的防火墙.</strong></div>
+<div><strong>(1)查看本机关于IPTABLES的设置情况</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -L -n</font><br>
+Chain INPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain FORWARD (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain OUTPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain RH-Firewall-1-INPUT (0 references)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icmp --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icmp type 255 <br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; esp&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ah&nbsp;&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; udp&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 224.0.0.251&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; udp dpt:5353 <br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; udp&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; udp dpt:631 <br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; state RELATED,ESTABLISHED <br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; state NEW tcp dpt:22 <br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; state NEW tcp dpt:80 <br>
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; state NEW tcp dpt:25 <br>
+REJECT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; reject-with icmp-host-prohibited <br>
+可以看出我在安装linux时,选择了有防火墙,并且开放了22,80,25端口.</div>
+<div>如果你在安装linux时没有选择启动防火墙,是这样的</div>
+<div>
+<div><font color="#0000ff">[root@tp ~]# iptables -L -n</font><br>
+Chain INPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain FORWARD (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain OUTPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;</div>
+<div>什么规则都没有.</div>
+<div><strong>(2)清除原有规则.</strong></div>
+<div>不管你在安装linux时是否启动了防火墙,如果你想配置属于自己的防火墙,那就清除现在filter的所有规则.</div>
+<div>
+<div><font color="#0000ff">[root@tp ~]# iptables -F</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 清除预设表filter中的所有规则链的规则<br>
+<font color="#0000ff">[root@tp ~]# iptables -X</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 清除预设表filter中使用者自定链中的规则</div>
+<div>我们在来看一下</div>
+<div><font color="#0000ff">[root@tp ~]# iptables -L -n</font><br>
+Chain INPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain FORWARD (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain OUTPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>什么都没有了吧,和我们在安装linux时没有启动防火墙是一样的.(提前说一句,这些配置就像用命令配置IP一样,重起就会失去作用),怎么保存.</div>
+<div><span style="font-size: 9pt"><font color="#0000ff"><font face="Courier New">[root@tp ~]# </font>/etc/rc.d/init.d/iptables save</font></span></div>
+<div></div>
+<div><span style="font-size: 9pt">这样就可以写到/etc/sysconfig/iptables文件里了.写入后记得把防火墙重起一下,才能起作用.</span></div>
+<div><span style="font-size: 9pt"><font color="#0000ff">[root@tp ~]# service iptables restart</font></span></div>
+<div></div>
+<div>现在IPTABLES配置表里什么配置都没有了,那我们开始我们的配置吧</div>
+<div><strong>(3)设定预设规则</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -p INPUT DROP</font></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -p OUTPUT ACCEPT</font></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -p FORWARD DROP</font><br>
+<strong><font style="background-color: rgb(255,255,255)" color="#ff0000">上面的意思是,当超出了IPTABLES里filter表里的两个链规则(INPUT,FORWARD)时,不在这两个规则里的数据包怎么处理呢,那就是DROP(放弃).应该说这样配置是很安全的.我们要控制流入数据包</font></strong></div>
+<div><strong><font style="background-color: rgb(255,255,255)" color="#ff0000">而对于OUTPUT链,也就是流出的包我们不用做太多限制,而是采取ACCEPT,也就是说,不在着个规则里的包怎么办呢,那就是通过.</font></strong></div>
+<div><strong><font style="background-color: rgb(255,255,255)" color="#ff0000">可以看出INPUT,FORWARD两个链采用的是允许什么包通过,而OUTPUT链采用的是不允许什么包通过.</font></strong></div>
+<div><strong><font style="background-color: rgb(255,255,255)" color="#ff0000">这样设置还是挺合理的,当然你也可以三个链都DROP,但这样做我认为是没有必要的,而且要写的规则就会增加.但如果你只想要有限的几个规则是,如只做WEB服务器.还是推荐三个链都是DROP.</font></strong></div>
+<div>注:如果你是远程SSH登陆的话,当你输入第一个命令回车的时候就应该掉了.因为你没有设置任何规则.</div>
+<div>怎么办,去本机操作呗!</div>
+<div><strong>(4)添加规则.</strong></div>
+<div><strong><font color="#000000">首先添加INPUT链,INPUT链的默认规则是DROP,所以我们就写需要ACCETP(通过)的链</font></strong></div>
+<div><strong><font color="#000000">为了能采用远程SSH登陆,我们要开启22端口.</font></strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p tcp --dport 22 -j ACCEPT</font></div>
+<div><font style="background-color: rgb(255,255,255)" color="#ff0000">[root@tp ~]# iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT</font> <strong>(注:这个规则,如果你把OUTPUT 设置成DROP的就要写上这一部,好多人都是望了写这一部规则导致,始终无法SSH.在远程一下,是不是好了.</strong></div>
+<div><strong>其他的端口也一样,如果开启了web服务器,OUTPUT设置成DROP的话,同样也要添加一条链:</strong></div>
+<div><font color="#ff0000">[root@tp ~]# iptables -A OUTPUT -p tcp --sport 80 -j ACCEPT ,其他同理.)</font></div>
+<div><strong>如果做了WEB服务器,开启80端口.</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p tcp --dport 80 -j ACCEPT</font><br>
+<strong>如果做了邮件服务器,开启25,110端口.</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p tcp --dport 110 -j ACCEPT<br>
+[root@tp ~]# iptables -A INPUT -p tcp --dport 25 -j ACCEPT</font><br>
+<strong>如果做了FTP服务器,开启21端口</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p tcp --dport 21 -j ACCEPT</font></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p tcp --dport 20 -j ACCEPT</font></div>
+<div><strong>如果做了DNS服务器,开启53端口</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p tcp --dport 53 -j ACCEPT</font></div>
+<div>如果你还做了其他的服务器,需要开启哪个端口,照写就行了.</div>
+<div>上面主要写的都是INPUT链,凡是不在上面的规则里的,都DROP</div>
+<div><strong>允许icmp包通过,也就是允许ping,</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A OUTPUT -p icmp -j ACCEPT (OUTPUT设置成DROP的话)</font></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -p icmp -j ACCEPT&nbsp;&nbsp;&nbsp; (INPUT设置成DROP的话)</font><br>
+</div>
+<div>
+<div><strong>允许loopback!(不然会导致DNS无法正常关闭等问题)</strong></div>
+<div><font color="#0000ff">IPTABLES -A INPUT -i lo -p all -j ACCEPT (如果是INPUT DROP)<br>
+IPTABLES -A OUTPUT -o lo -p all -j ACCEPT(如果是OUTPUT DROP)<br>
+</font></div>
+</div>
+<div>下面写OUTPUT链,OUTPUT链默认规则是ACCEPT,所以我们就写需要DROP(放弃)的链.</div>
+<div><strong>减少不安全的端口连接</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A OUTPUT -p tcp --sport 31337 -j DROP</font></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A OUTPUT -p tcp --dport 31337 -j DROP</font></div>
+<div><font color="#000000" size="2">有些些特洛伊木马会扫描端口31337到31340(即黑客语言中的 elite 端口)上的服务。既然合法服务都不使用这些非标准端口来通信,阻塞这些端口能够有效地减少你的网络上可能被感染的机器和它们的远程主服务器进行独立通信的机会</font></div>
+<div><font color="#000000">还有其他端口也一样,像:31335、27444、27665、20034 NetBus、9704、137-139（smb）,2049(NFS)端口也应被禁止,我在这写的也不全,有兴趣的朋友应该去查一下相关资料.</font></div>
+<div></div>
+<div><strong><font color="#ff0000">当然出入更安全的考虑你也可以包OUTPUT链设置成DROP,那你添加的规则就多一些,就像上边添加</font></strong></div>
+<div><strong><font color="#ff0000">允许SSH登陆一样.照着写就行了.</font></strong></div>
+<div></div>
+<div><strong>下面写一下更加细致的规则,就是限制到某台机器</strong></div>
+<div><strong>如:我们只允许192.168.0.3的机器进行SSH连接</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A INPUT -s 192.168.0.3 -p tcp --dport 22 -j ACCEPT</font></div>
+<div>如果要允许,或限制一段IP地址可用 192.168.0.0/24 表示192.168.0.1-255端的所有IP.</div>
+<div>24表示子网掩码数.但要记得把 /etc/sysconfig/iptables 里的这一行删了.</div>
+<div>-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT 因为它表示所有地址都可以登陆.</div>
+<div>或采用命令方式:</div>
+<div><font color="#0000ff">[root@tp ~]# iptables -D INPUT -p tcp --dport 22 -j ACCEPT</font></div>
+<div>然后保存,我再说一边,反是采用命令的方式,只在当时生效,如果想要重起后也起作用,那就要保存.写入到/etc/sysconfig/iptables文件里.</div>
+<div><span style="font-size: 9pt"><font color="#0000ff"><font face="Courier New">[root@tp ~]# </font>/etc/rc.d/init.d/iptables save</font></span></div>
+<div>这样写 !192.168.0.3 表示除了192.168.0.3的ip地址</div>
+<div>其他的规则连接也一样这么设置.</div>
+<div></div>
+<div><strong>在下面就是FORWARD链,FORWARD链的默认规则是DROP,所以我们就写需要ACCETP(通过)的链,对正在转发链的监控.</strong></div>
+<div><strong>开启转发功能,(在做NAT时,FORWARD默认规则是DROP时,必须做)</strong></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT</font></div>
+<div><font color="#0000ff">[root@tp ~]# iptables -A FORWARD -i eth1 -o eh0 -j ACCEPT</font></div>
+<div><strong>丢弃坏的TCP包</strong></div>
+<div>[root@tp ~]#iptables -A FORWARD -p TCP ! --syn -m state --state NEW -j DROP</div>
+<div><strong>处理IP碎片数量,防止攻击,允许每秒100个</strong></div>
+<div><font color="#0000ff">[root@tp ~]#iptables -A FORWARD -f -m limit --limit 100/s --limit-burst 100 -j ACCEPT</font></div>
+<div><strong>设置ICMP包过滤,允许每秒1个包,限制触发条件是10个包.</strong> </div>
+<div><font color="#0000ff">[root@tp ~]#iptables -A FORWARD -p icmp -m limit --limit 1/s --limit-burst 10 -j ACCEPT</font></div>
+<div>我在前面只所以允许ICMP包通过,就是因为我在这里有限制.<br>
+</div>
+<div><font color="#000000"><strong>二,配置一个NAT表放火墙</strong></font></div>
+<div><strong>1,查看本机关于NAT的设置情况</strong></div>
+<div><strong>[root@tp rc.d]# iptables -t nat -L</strong><br>
+Chain PREROUTING (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>Chain POSTROUTING (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+SNAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;&nbsp;&nbsp; --&nbsp;&nbsp;&nbsp; 192.168.0.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; anywhere&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to:211.101.46.235 </div>
+<div>Chain OUTPUT (policy ACCEPT)<br>
+target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prot opt source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; destination&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<div>我的NAT已经配置好了的(只是提供最简单的代理上网功能,还没有添加防火墙规则).关于怎么配置NAT,参考我的另一篇文章</div>
+<div>当然你如果还没有配置NAT的话,你也不用清除规则,因为NAT在默认情况下是什么都没有的</div>
+<div><strong>如果你想清除,命令是</strong></div>
+<div><span style="font-size: 10pt"><font face="Courier New" color="#0000ff">[root@tp ~]# iptables -F -t nat</font></span></div>
+<div><span style="font-size: 10pt"><font face="Courier New"><span style="font-size: 10pt"><font face="Courier New" color="#0000ff">[root@tp ~]# iptables -X -t nat</font></span></font></span></div>
+<div><span style="font-size: 10pt"><font face="Courier New"><span style="font-size: 10pt"><font face="Courier New" color="#0000ff">[root@tp ~]# iptables -<span style="font-size: 10pt"><span style="font-size: 10pt"><font face="Courier New">Z</font></span></span> -t nat</font></span></font></span></div>
+<div><span style="font-size: 10pt"></span></div>
+<div><strong>2,添加规则</strong></div>
+<div><strong>添加基本的NAT地址转换,(关于如何配置NAT可以看我的另一篇文章),</strong></div>
+<div><strong>添加规则,我们只添加DROP链.因为默认链全是ACCEPT.</strong></div>
+<div><strong>防止外网用内网IP欺骗</strong></div>
+<div><font color="#0000ff">[root@tp sysconfig]# iptables -t nat -A PREROUTING -i eth0 -s 10.0.0.0/8 -j DROP<br>
+[root@tp sysconfig]# iptables -t nat -A PREROUTING -i eth0 -s 172.16.0.0/12 -j DROP<br>
+[root@tp sysconfig]# iptables -t nat -A PREROUTING -i eth0 -s 192.168.0.0/16 -j DROP</font><br>
+<strong>如果我们想,比如阻止MSN,QQ,BT等的话,需要找到它们所用的端口或者IP,(个人认为没有太大必要)</strong></div>
+<div><strong>例：</strong></div>
+<div>
+<div><span style="font-size: 10pt"><strong>禁止与211.101.46.253的所有连接</strong></span></div>
+<font color="#0000ff"></font><span style="font-size: 10pt"><font color="#0000ff"><font face="Courier New">[root@tp ~]# iptables </font>-t nat -A PREROUTING&nbsp;&nbsp;&nbsp; -d 211.101.46.253 -j DROP</font></span></div>
+</div>
+</div>
+<div>
+<div><span style="font-size: 10pt"><span style="font-size: 10pt"><strong>禁用FTP(21)端口</strong></span> </span></div>
+<div><span style="font-size: 10pt"><font color="#0000ff"><font face="Courier New">[root@tp ~]# iptables </font>-t nat -A PREROUTING -p tcp --dport 21 -j DROP</font></span></div>
+<div><strong>这样写范围太大了,我们可以更精确的定义.</strong></div>
+<div><span style="font-size: 10pt"><font color="#0000ff"><font face="Courier New">[root@tp ~]# iptables </font>-t nat -A PREROUTING&nbsp;&nbsp;&nbsp; -p tcp --dport 21 -d 211.101.46.253 -j DROP</font> </span></div>
+<div><span style="font-size: 10pt"><strong>这样只禁用211.101.46.253地址的FTP连接,其他连接还可以.如web(80端口)连接.</strong></span></div>
+</div>
+<div><strong>按照我写的,你只要找到QQ,MSN等其他软件的IP地址,和端口,以及基于什么协议,只要照着写就行了.</strong></div>
+<div></div>
+<div><strong>最后：</strong></div>
+<div><strong>drop非法连接</strong><br>
+<font color="#0000ff">[root@tp ~]# iptables -A INPUT&nbsp;&nbsp;&nbsp;&nbsp; -m state --state INVALID -j DROP<br>
+[root@tp ~]# iptables -A OUTPUT&nbsp;&nbsp;&nbsp; -m state --state INVALID -j DROP<br>
+[root@tp ~]# iptables-A FORWARD -m state --state INVALID -j DROP</font><br>
+<strong>允许所有已经建立的和相关的连接</strong><br>
+<font color="#0000ff">[root@tp ~]# iptables-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT<br>
+[root@tp ~]# iptables-A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT<br>
+</font></div>
+<p><span style="font-size: 9pt"><font color="#0000ff"><font face="Courier New">[root@tp ~]# </font>/etc/rc.d/init.d/iptables save</font></span></p>
+<p><span style="font-size: 9pt"><strong>这样就可以写到/etc/sysconfig/iptables文件里了.写入后记得把防火墙重起一下,才能起作用．</strong></span></p>
+<p><span style="font-size: 9pt"><font color="#0000ff">[root@tp ~]# service iptables restart</font></span></p>
+<br>
+<strong>别忘了保存，不行就写一部保存一次．你可以一边保存，一边做实验，看看是否达到你的要求， </strong>
+<div><strong>上面的所有规则我都试过，没有问题．</strong></div>
+<div><strong>写这篇文章，用了我将近１个月的时间．查找资料，自己做实验，希望对大家有所帮助．如有不全及不完善的地方还请提出.</strong></div>
+<div><strong>因为本篇文章以配置为主.关于IPTABLES的基础知识及指令命令说明等我会尽快传上,当然你可以去网上搜索一下,还是很多的.</strong></div>
+</div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory">分类: <a href="http://www.cnblogs.com/JemBai/category/144384.html" target="_blank">LINUX</a></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info"><div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(1416364,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+            <a id="green_channel_follow" onclick="follow(&#39;8945420b-63cf-dd11-9e4d-001cf0cd104b&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/JemBai/" target="_blank"><img src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/sample_face.gif" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/JemBai/">草原和大树</a><br>
+            <a href="http://home.cnblogs.com/u/JemBai/followees">关注 - 0</a><br>
+            <a href="http://home.cnblogs.com/u/JemBai/followers">粉丝 - 325</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;8945420b-63cf-dd11-9e4d-001cf0cd104b&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(1416364,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">45</span>
+    </div>
+    <div class="buryit" onclick="votePost(1416364,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/18/1415121.html" class="p_n_p_prefix">« </a> 上一篇：<a href="http://www.cnblogs.com/JemBai/archive/2009/03/18/1415121.html" title="发布于2009-03-18 10:08">asp.net数据控件 数据绑定控件比较 </a><br><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416369.html" class="p_n_p_prefix">» </a> 下一篇：<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416369.html" title="发布于2009-03-19 10:43">Zend Studio For Eclipse 6.0 注册码 </a><br></div>
+</div>
+
+
+	<div class="postDesc">posted on <span id="post-date">2009-03-19 10:42</span> <a href="http://www.cnblogs.com/JemBai/">草原和大树</a> 阅读(<span id="post_view_count">376517</span>) 评论(<span id="post_comment_count">44</span>)  <a href="https://i.cnblogs.com/EditPosts.aspx?postid=1416364" rel="nofollow">编辑</a> <a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#" onclick="AddToWz(1416364);return false;">收藏</a></div>
+</div>
+<script type="text/javascript">var allowComments=true,cb_blogId=39982,cb_entryId=1416364,cb_blogApp=currentBlogApp,cb_blogUserGuid='8945420b-63cf-dd11-9e4d-001cf0cd104b',cb_entryCreatedDate='2009/3/19 10:42:00';loadViewCount(cb_entryId);</script>
+
+</div><a name="!comments"></a><div id="blog-comments-placeholder"><div id="comments_pager_top"></div>
+<!--done-->
+<br>
+<b>评论:</b>
+<div class="feedbackNoItems"></div>
+	
+
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2331351" class="layer">#1楼</a><a name="2331351" id="comment_anchor_2331351"></a>
+				 <span class="comment_date">2012-03-15 11:39</span> | <a id="a_comment_author_2331351" href="http://home.cnblogs.com/u/386028/" target="_blank">shiqillx</a> <a href="http://msg.cnblogs.com/send/shiqillx" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2331351" class="blog_comment_body">很不错，学习了！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2331351,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2331351,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2405657" class="layer">#2楼</a><a name="2405657" id="comment_anchor_2405657"></a>
+				 <span class="comment_date">2012-06-21 11:59</span> | <a id="a_comment_author_2405657" href="http://home.cnblogs.com/u/420737/" target="_blank">pooxooq</a> <a href="http://msg.cnblogs.com/send/pooxooq" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2405657" class="blog_comment_body">受益匪浅</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2405657,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2405657,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2421390" class="layer">#3楼</a><a name="2421390" id="comment_anchor_2421390"></a>
+				 <span class="comment_date">2012-07-08 09:18</span> | <a id="a_comment_author_2421390" href="http://www.cnblogs.com/AzikPhil/" target="_blank">Azik</a> <a href="http://msg.cnblogs.com/send/Azik" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2421390" class="blog_comment_body">真的是非常详细，学习了~感谢分享~</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2421390,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2421390,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2421390_avatar" style="display:none;">http://pic.cnblogs.com/face/u368784.jpg?id=12161754</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2421397" class="layer">#4楼</a><a name="2421397" id="comment_anchor_2421397"></a>
+				 <span class="comment_date">2012-07-08 09:41</span> | <a id="a_comment_author_2421397" href="http://www.cnblogs.com/AzikPhil/" target="_blank">Azik</a> <a href="http://msg.cnblogs.com/send/Azik" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2421397" class="blog_comment_body">LZ，有个问题请教，为什么我使用<br>#iptables -F<br>之后，再使用<br>#iptables -p INPUT DROP<br>提示<br>unknow protocol 'input' specified</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2421397,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2421397,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2421397_avatar" style="display:none;">http://pic.cnblogs.com/face/u368784.jpg?id=12161754</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2457240" class="layer">#5楼</a><a name="2457240" id="comment_anchor_2457240"></a>
+				 <span class="comment_date">2012-08-27 16:30</span> | <a id="a_comment_author_2457240" href="http://www.cnblogs.com/windstore/" target="_blank">雪海飘香</a> <a href="http://msg.cnblogs.com/send/%E9%9B%AA%E6%B5%B7%E9%A3%98%E9%A6%99" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2457240" class="blog_comment_body"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2421397" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,2421397);">@</a>
+Azik<br>p大写，<br>p小写指的是端口port，大写指的是策略policey.<br><br>iptables -P INPUT DROP</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2457240,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2457240,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2457240_avatar" style="display:none;">http://pic.cnblogs.com/face/u22752.jpg?id=25100002</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2483178" class="layer">#6楼</a><a name="2483178" id="comment_anchor_2483178"></a>
+				 <span class="comment_date">2012-09-27 11:14</span> | <a id="a_comment_author_2483178" href="http://home.cnblogs.com/u/399405/" target="_blank">dreamhgf</a> <a href="http://msg.cnblogs.com/send/dreamhgf" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2483178" class="blog_comment_body">可以将 /etc/sysconfig/iptables-config 里面的IPTABLES_SAVE_ON_STOP=no 改为IPTABLES_SAVE_ON_STOP=yes<br>就可以在每次服务停前自动将保存现有规则</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2483178,&#39;Digg&#39;,this)">支持(1)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2483178,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2527636" class="layer">#7楼</a><a name="2527636" id="comment_anchor_2527636"></a>
+				 <span class="comment_date">2012-11-08 21:29</span> | <a id="a_comment_author_2527636" href="http://home.cnblogs.com/u/326540/" target="_blank">左瞧瞧右瞧瞧</a> <a href="http://msg.cnblogs.com/send/%E5%B7%A6%E7%9E%A7%E7%9E%A7%E5%8F%B3%E7%9E%A7%E7%9E%A7" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2527636" class="blog_comment_body">非常感谢，很有用啊</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2527636,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2527636,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2554821" class="layer">#8楼</a><a name="2554821" id="comment_anchor_2554821"></a>
+				 <span class="comment_date">2012-11-17 22:19</span> | <a id="a_comment_author_2554821" href="http://home.cnblogs.com/u/319770/" target="_blank">yedaxia</a> <a href="http://msg.cnblogs.com/send/yedaxia" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2554821" class="blog_comment_body">很详细，谢谢你的耐心！对我很有帮助!</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2554821,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2554821,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2591146" class="layer">#9楼</a><a name="2591146" id="comment_anchor_2591146"></a>
+				 <span class="comment_date">2013-01-03 04:05</span> | <a id="a_comment_author_2591146" href="http://home.cnblogs.com/u/485758/" target="_blank">ysqisme</a> <a href="http://msg.cnblogs.com/send/ysqisme" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2591146" class="blog_comment_body">好复杂的规则啊</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2591146,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2591146,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2595222" class="layer">#10楼</a><a name="2595222" id="comment_anchor_2595222"></a>
+				 <span class="comment_date">2013-01-08 11:10</span> | <a id="a_comment_author_2595222" href="http://home.cnblogs.com/u/487483/" target="_blank">dillyding1688</a> <a href="http://msg.cnblogs.com/send/dillyding1688" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2595222" class="blog_comment_body">謝謝啊，正好用。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2595222,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2595222,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2628347" class="layer">#11楼</a><a name="2628347" id="comment_anchor_2628347"></a>
+				 <span class="comment_date">2013-03-05 18:46</span> | <a id="a_comment_author_2628347" href="http://home.cnblogs.com/u/501418/" target="_blank">友谊之门</a> <a href="http://msg.cnblogs.com/send/%E5%8F%8B%E8%B0%8A%E4%B9%8B%E9%97%A8" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2628347" class="blog_comment_body">提一个小BUG啊：<br><br>上面的那个第四条中的发布DNS规则，是不是应该发布UDP的53端口啊<br><br>只有DNS服务器之间同步数据的时候使用的是TCP的53端口，客户端请求解析的时候使用的是UDP的53端口哦~~~</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2628347,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2628347,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2632479" class="layer">#12楼</a><a name="2632479" id="comment_anchor_2632479"></a>
+				 <span class="comment_date">2013-03-11 17:38</span> | <a id="a_comment_author_2632479" href="http://home.cnblogs.com/u/88824/" target="_blank">Gray13</a> <a href="http://msg.cnblogs.com/send/Gray13" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2632479" class="blog_comment_body">确实好文。。。input 和 output用的上。。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2632479,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2632479,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2645026" class="layer">#13楼</a><a name="2645026" id="comment_anchor_2645026"></a>
+				 <span class="comment_date">2013-03-28 18:39</span> | <a id="a_comment_author_2645026" href="http://www.cnblogs.com/Oover/" target="_blank">Oover</a> <a href="http://msg.cnblogs.com/send/Oover" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2645026" class="blog_comment_body">好强大啊！学习了！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2645026,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2645026,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2648163" class="layer">#14楼</a><a name="2648163" id="comment_anchor_2648163"></a>
+				 <span class="comment_date">2013-04-02 12:16</span> | <a id="a_comment_author_2648163" href="http://home.cnblogs.com/u/512294/" target="_blank">电信骄子</a> <a href="http://msg.cnblogs.com/send/%E7%94%B5%E4%BF%A1%E9%AA%84%E5%AD%90" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2648163" class="blog_comment_body">楼主 ，请问你知道怎么用ip6tables将linux配置成一台ipv6路由器么？小弟急等。。。  QQ：1145751528  楼主看见了请告诉我一下，或发点资料到我邮箱，小弟在此感激不尽！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2648163,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2648163,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2666336" class="layer">#15楼</a><a name="2666336" id="comment_anchor_2666336"></a>
+				 <span class="comment_date">2013-04-25 16:25</span> | <a id="a_comment_author_2666336" href="http://www.cnblogs.com/xiaoyue07070/" target="_blank">晓玥</a> <a href="http://msg.cnblogs.com/send/%E6%99%93%E7%8E%A5" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2666336" class="blog_comment_body">不错，很详细，想要转走，怎么转么？</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2666336,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2666336,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2691986" class="layer">#16楼</a><a name="2691986" id="comment_anchor_2691986"></a>
+				 <span class="comment_date">2013-05-28 17:32</span> | <a id="a_comment_author_2691986" href="http://www.cnblogs.com/txwsqk/" target="_blank">txwsqk</a> <a href="http://msg.cnblogs.com/send/txwsqk" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2691986" class="blog_comment_body"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2457240" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,2457240);">@</a>
+雪海飘香<br>policy</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2691986,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2691986,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2691986_avatar" style="display:none;">http://pic.cnblogs.com/face/u159663.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2738540" class="layer">#17楼</a><a name="2738540" id="comment_anchor_2738540"></a>
+				 <span class="comment_date">2013-07-30 01:31</span> | <a id="a_comment_author_2738540" href="http://home.cnblogs.com/u/552745/" target="_blank">haodd</a> <a href="http://msg.cnblogs.com/send/haodd" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2738540" class="blog_comment_body">学到很多。谢谢！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2738540,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2738540,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2775657" class="layer">#18楼</a><a name="2775657" id="comment_anchor_2775657"></a>
+				 <span class="comment_date">2013-09-14 17:46</span> | <a id="a_comment_author_2775657" href="http://www.cnblogs.com/king_wgj/" target="_blank">王国金</a> <a href="http://msg.cnblogs.com/send/%E7%8E%8B%E5%9B%BD%E9%87%91" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2775657" class="blog_comment_body">感谢楼主，辛苦了，很受用！！！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2775657,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2775657,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2795018" class="layer">#19楼</a><a name="2795018" id="comment_anchor_2795018"></a>
+				 <span class="comment_date">2013-10-17 00:20</span> | <a id="a_comment_author_2795018" href="http://home.cnblogs.com/u/554656/" target="_blank">FreeLess</a> <a href="http://msg.cnblogs.com/send/FreeLess" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2795018" class="blog_comment_body">好文，顶一个</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2795018,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2795018,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2814992" class="layer">#20楼</a><a name="2814992" id="comment_anchor_2814992"></a>
+				 <span class="comment_date">2013-11-12 16:14</span> | <a id="a_comment_author_2814992" href="http://home.cnblogs.com/u/571943/" target="_blank">dymon</a> <a href="http://msg.cnblogs.com/send/dymon" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2814992" class="blog_comment_body">Very well， thanks！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2814992,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2814992,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2831943" class="layer">#21楼</a><a name="2831943" id="comment_anchor_2831943"></a>
+				 <span class="comment_date">2013-12-06 16:33</span> | <a id="a_comment_author_2831943" href="http://www.cnblogs.com/vica/" target="_blank">瓶,行於途</a> <a href="http://msg.cnblogs.com/send/%E7%93%B6%2C%E8%A1%8C%E6%96%BC%E9%80%94" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2831943" class="blog_comment_body">(3)设定预设规则<br>应该是大写P，小写p是 协议</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2831943,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2831943,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2831943_avatar" style="display:none;">http://pic.cnblogs.com/face/88024/20131030134103.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2841080" class="layer">#22楼</a><a name="2841080" id="comment_anchor_2841080"></a>
+				 <span class="comment_date">2013-12-19 18:42</span> | <a id="a_comment_author_2841080" href="http://home.cnblogs.com/u/593043/" target="_blank">china1991419</a> <a href="http://msg.cnblogs.com/send/china1991419" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2841080" class="blog_comment_body">[root@tp ~]#iptables -A FORWARD -p icmp -m limit --limit 1/s --limit-burst 10 -j ACCEPT<br>上面应该是iptables -A INPUT -p icmp -m limit --limit 1/s --limit-burst 10 -j ACCEPT，前面设置的是INPUT链，后面是FORWARD链。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2841080,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2841080,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2841082" class="layer">#23楼</a><a name="2841082" id="comment_anchor_2841082"></a>
+				 <span class="comment_date">2013-12-19 18:43</span> | <a id="a_comment_author_2841082" href="http://home.cnblogs.com/u/593043/" target="_blank">china1991419</a> <a href="http://msg.cnblogs.com/send/china1991419" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2841082" class="blog_comment_body">并且 iptables -A INPUT -p icmp -j ACCEPT这条存在的话，iptables -A INPUT -p icmp -m limit --limit 1/s --limit-burst 10 -j ACCEPT这条是不起作用的。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2841082,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2841082,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2845896" class="layer">#24楼</a><a name="2845896" id="comment_anchor_2845896"></a>
+				 <span class="comment_date">2013-12-27 14:28</span> | <a id="a_comment_author_2845896" href="http://home.cnblogs.com/u/480136/" target="_blank">FLove晖</a> <a href="http://msg.cnblogs.com/send/FLove%E6%99%96" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2845896" class="blog_comment_body">Ding....辛苦了</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2845896,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2845896,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2862171" class="layer">#25楼</a><a name="2862171" id="comment_anchor_2862171"></a>
+				 <span class="comment_date">2014-01-15 22:58</span> | <a id="a_comment_author_2862171" href="http://www.cnblogs.com/boansmith/" target="_blank">boansmith</a> <a href="http://msg.cnblogs.com/send/boansmith" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2862171" class="blog_comment_body">楼主辛苦了！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2862171,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2862171,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2862171_avatar" style="display:none;">http://pic.cnblogs.com/face/572376/20131009085314.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2917119" class="layer">#26楼</a><a name="2917119" id="comment_anchor_2917119"></a>
+				 <span class="comment_date">2014-04-14 10:09</span> | <a id="a_comment_author_2917119" href="http://www.cnblogs.com/jintianfan/" target="_blank">金天凡</a> <a href="http://msg.cnblogs.com/send/%E9%87%91%E5%A4%A9%E5%87%A1" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2917119" class="blog_comment_body">有用</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2917119,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2917119,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2917119_avatar" style="display:none;">http://pic.cnblogs.com/face/591248/20131213172209.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2925497" class="layer">#27楼</a><a name="2925497" id="comment_anchor_2925497"></a>
+				 <span class="comment_date">2014-04-25 16:56</span> | <a id="a_comment_author_2925497" href="http://home.cnblogs.com/u/525831/" target="_blank">银角大王</a> <a href="http://msg.cnblogs.com/send/%E9%93%B6%E8%A7%92%E5%A4%A7%E7%8E%8B" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2925497" class="blog_comment_body">楼主幸苦，好文章。<br>作为一个菜鸟，我有点没想明白是，开启22端口这里<br><div class="cnblogs_Highlighter sh-gutter"><div><div id="highlighter_809215" class="syntaxhighlighter  csharp"><div class="toolbar"><span><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="csharp plain">[root@tp ~]# iptables -A INPUT -p tcp --dport 22 -j ACCEPT</code></div><div class="line number2 index1 alt1"><code class="csharp plain">[root@tp ~]# iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT (注:这个规则,如果你把OUTPUT 设置成DROP的就要写上这一部,好多人都是望了写这一部规则导致,始终无法SSH.在远程一下,是不是好了.</code></div><div class="line number3 index2 alt2"><code class="csharp plain">其他的端口也一样,如果开启了web服务器,OUTPUT设置成DROP的话,同样也要添加一条链:</code></div><div class="line number4 index3 alt1"><code class="csharp plain">[root@tp ~]# iptables -A OUTPUT -p tcp --sport 80 -j ACCEPT ,其他同理.)</code></div></div></td></tr></tbody></table></div></div></div><br><br>之前设置的OUTPUT规则不是ACCEPT么，就是说不在这个规则里的所有都接受？ 那为什么反而要把22端口添进去才能用呢？？之前已经设置了INPUT了呀</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2925497,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2925497,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2970394" class="layer">#28楼</a><a name="2970394" id="comment_anchor_2970394"></a>
+				 <span class="comment_date">2014-06-24 11:15</span> | <a id="a_comment_author_2970394" href="http://home.cnblogs.com/u/346349/" target="_blank">秋日落忆</a> <a href="http://msg.cnblogs.com/send/%E7%A7%8B%E6%97%A5%E8%90%BD%E5%BF%86" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_2970394" class="blog_comment_body">当我看到你写的这样时——<br><br>“注:如果你是远程SSH登陆的话,当你输入第一个命令回车的时候就应该掉了.因为你没有设置任何规则.<br>怎么办,去本机操作呗!”<br><br>我真想说你一句脑残啊，估计你把很多新手给坑了。<br>为啥不把这个注解优先放在<br>“ iptables -p INPUT DROP”<br>的附近？<br><br>比如说：<br>iptables -p INPUT DROP（警告：如果你是远程SSH登陆，该规则会让你断开ssh连接，建议预先加入规则：iptables -A INPUT -p tcp --dport 22 -j ACCEPT）<br><br>方便你的顾客，这就是有服务意识。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2970394,&#39;Digg&#39;,this)">支持(2)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2970394,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3019003" class="layer">#29楼</a><a name="3019003" id="comment_anchor_3019003"></a>
+				 <span class="comment_date">2014-08-29 10:07</span> | <a id="a_comment_author_3019003" href="http://www.cnblogs.com/drgcaosheng/" target="_blank">samcao</a> <a href="http://msg.cnblogs.com/send/samcao" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3019003" class="blog_comment_body">看过多次.在使用的时候.总会不经意间跑过来查下.自己写的规则是否有误.</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3019003,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3019003,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3019003_avatar" style="display:none;">http://pic.cnblogs.com/face/636544/20140523135746.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3115921" class="layer">#30楼</a><a name="3115921" id="comment_anchor_3115921"></a>
+				 <span class="comment_date">2015-01-27 12:01</span> | <a id="a_comment_author_3115921" href="http://www.cnblogs.com/diyunpeng/" target="_blank">规格严格-功夫到家</a> <a href="http://msg.cnblogs.com/send/%E8%A7%84%E6%A0%BC%E4%B8%A5%E6%A0%BC-%E5%8A%9F%E5%A4%AB%E5%88%B0%E5%AE%B6" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3115921" class="blog_comment_body">学习了～～</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3115921,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3115921,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3147743" class="layer">#31楼</a><a name="3147743" id="comment_anchor_3147743"></a>
+				 <span class="comment_date">2015-03-24 17:11</span> | <a id="a_comment_author_3147743" href="http://www.cnblogs.com/falconchen/" target="_blank">falcon_chen</a> <a href="http://msg.cnblogs.com/send/falcon_chen" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3147743" class="blog_comment_body">写得很详细，有个错误需要修正一下：<br><fieldset class="comment_quote"><legend>引用</legend>[root@tp ~]# iptables -p INPUT DROP<br>[root@tp ~]# iptables -p OUTPUT ACCEPT<br>[root@tp ~]# iptables -p FORWARD DROP</fieldset><br><br>这个-P应该是大写的，小写表示协议</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3147743,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3147743,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3162747" class="layer">#32楼</a><a name="3162747" id="comment_anchor_3162747"></a>
+				 <span class="comment_date">2015-04-14 23:15</span> | <a id="a_comment_author_3162747" href="http://www.cnblogs.com/eiguleo/" target="_blank">eiguleo</a> <a href="http://msg.cnblogs.com/send/eiguleo" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3162747" class="blog_comment_body">好文，赞。。。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3162747,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3162747,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3162747_avatar" style="display:none;">http://pic.cnblogs.com/face/579068/20150125162515.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3173794" class="layer">#33楼</a><a name="3173794" id="comment_anchor_3173794"></a>
+				 <span class="comment_date">2015-04-30 14:06</span> | <a id="a_comment_author_3173794" href="http://home.cnblogs.com/u/370189/" target="_blank">珠烁晶莹</a> <a href="http://msg.cnblogs.com/send/%E7%8F%A0%E7%83%81%E6%99%B6%E8%8E%B9" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3173794" class="blog_comment_body">感谢分享！！！！！！！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3173794,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3173794,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3215224" class="layer">#34楼</a><a name="3215224" id="comment_anchor_3215224"></a>
+				 <span class="comment_date">2015-06-25 16:54</span> | <a id="a_comment_author_3215224" href="http://www.cnblogs.com/luckyjinping/" target="_blank">luckyjinping</a> <a href="http://msg.cnblogs.com/send/luckyjinping" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3215224" class="blog_comment_body">学习了，感觉楼主是全能啊，什么领域都懂啊。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3215224,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3215224,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3239068" class="layer">#35楼</a><a name="3239068" id="comment_anchor_3239068"></a>
+				 <span class="comment_date">2015-07-31 16:07</span> | <a id="a_comment_author_3239068" href="http://www.cnblogs.com/jayzee/" target="_blank">Jayzee</a> <a href="http://msg.cnblogs.com/send/Jayzee" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3239068" class="blog_comment_body">感谢楼主分享！！！！！！！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3239068,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3239068,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3239068_avatar" style="display:none;">http://pic.cnblogs.com/face/467292/20130708173008.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3254763" class="layer">#36楼</a><a name="3254763" id="comment_anchor_3254763"></a>
+				 <span class="comment_date">2015-08-26 16:51</span> | <a id="a_comment_author_3254763" href="http://www.cnblogs.com/nan86150/" target="_blank">nan86150</a> <a href="http://msg.cnblogs.com/send/nan86150" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3254763" class="blog_comment_body"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2970394" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,2970394);">@</a>
+秋日落忆<br>哈哈，果然这个太坑，还好我是先看没照着来</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3254763,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3254763,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3264718" class="layer">#37楼</a><a name="3264718" id="comment_anchor_3264718"></a>
+				 <span class="comment_date">2015-09-11 10:45</span> | <a id="a_comment_author_3264718" href="http://www.cnblogs.com/cz-blog/" target="_blank">陈贞</a> <a href="http://msg.cnblogs.com/send/%E9%99%88%E8%B4%9E" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3264718" class="blog_comment_body"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2421397" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,2421397);">@</a>
+Azik<br>-P 是大写的P<br>有问题多 --help</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3264718,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3264718,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3264718_avatar" style="display:none;">http://pic.cnblogs.com/face/547565/20150904225722.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3371986" class="layer">#38楼</a><a name="3371986" id="comment_anchor_3371986"></a>
+				 <span class="comment_date">2016-03-04 15:32</span> | <a id="a_comment_author_3371986" href="http://www.cnblogs.com/cebang/" target="_blank">cebang</a> <a href="http://msg.cnblogs.com/send/cebang" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3371986" class="blog_comment_body">新手学习了</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3371986,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3371986,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3396926" class="layer">#39楼</a><a name="3396926" id="comment_anchor_3396926"></a>
+				 <span class="comment_date">2016-03-31 16:21</span> | <a id="a_comment_author_3396926" href="http://home.cnblogs.com/u/603212/" target="_blank">df45zh</a> <a href="http://msg.cnblogs.com/send/df45zh" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3396926" class="blog_comment_body">太棒了，学习了，正好用到</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3396926,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3396926,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3420602" class="layer">#40楼</a><a name="3420602" id="comment_anchor_3420602"></a>
+				 <span class="comment_date">2016-04-30 14:57</span> | <a id="a_comment_author_3420602" href="http://home.cnblogs.com/u/662511/" target="_blank">专心走路</a> <a href="http://msg.cnblogs.com/send/%E4%B8%93%E5%BF%83%E8%B5%B0%E8%B7%AF" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3420602" class="blog_comment_body">好文收藏了！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3420602,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3420602,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3452263" class="layer">#41楼</a><a name="3452263" id="comment_anchor_3452263"></a>
+				 <span class="comment_date">2016-06-15 03:16</span> | <a id="a_comment_author_3452263" href="http://home.cnblogs.com/u/978310/" target="_blank">Setchio</a> <a href="http://msg.cnblogs.com/send/Setchio" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3452263" class="blog_comment_body">丢弃坏的TCP包！？<br>我读书少，你别骗我。<br><br>告诫新手，这里的坑太多，大家看看就好，别当真。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3452263,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3452263,&#39;Bury&#39;,this)">反对(0)</a></div>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3478615" class="layer">#42楼</a><a name="3478615" id="comment_anchor_3478615"></a>
+				 <span class="comment_date">2016-07-28 20:22</span> | <a id="a_comment_author_3478615" href="http://www.cnblogs.com/xiami303/" target="_blank">小侠女</a> <a href="http://msg.cnblogs.com/send/%E5%B0%8F%E4%BE%A0%E5%A5%B3" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3478615" class="blog_comment_body"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2925497" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,2925497);">@</a>
+银角大王<br>你理解的不对，楼主说如果设置的是drop， 就要单独开你要用的端口。如果你设置了drop后，可能就立刻无法远程了，直接去机器上accept 22 端口后，才能继续远程。</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3478615,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3478615,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3478615_avatar" style="display:none;">http://pic.cnblogs.com/face/316363/20140107142247.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3478617" class="layer">#43楼</a><a name="3478617" id="comment_anchor_3478617"></a>
+				 <span class="comment_date">2016-07-28 20:24</span> | <a id="a_comment_author_3478617" href="http://www.cnblogs.com/xiami303/" target="_blank">小侠女</a> <a href="http://msg.cnblogs.com/send/%E5%B0%8F%E4%BE%A0%E5%A5%B3" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3478617" class="blog_comment_body"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#2970394" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,2970394);">@</a>
+秋日落忆<br>也太新手了，看完理解了再操作呀！ O(∩_∩)O  无法远程，机器如果在机房，你顺便又不是IT，就惨咯~~~</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3478617,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3478617,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3478617_avatar" style="display:none;">http://pic.cnblogs.com/face/316363/20140107142247.png</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+			<a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3495051" class="layer">#44楼</a><a name="3495051" id="comment_anchor_3495051"></a><span id="comment-maxId" style="display:none;">3495051</span><span id="comment-maxDate" style="display:none;">2016/8/24 0:31:30</span>
+				 <span class="comment_date">2016-08-24 00:31</span> | <a id="a_comment_author_3495051" href="http://www.cnblogs.com/anycc/" target="_blank">AnyYoung</a> <a href="http://msg.cnblogs.com/send/AnyYoung" title="发送站内短消息" class="sendMsg2This">&nbsp;</a><br>
+				<div align="left"><div id="comment_body_3495051" class="blog_comment_body">楼主特意登录   评论，希望能够转发</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3495051,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3495051,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3495051_avatar" style="display:none;">http://pic.cnblogs.com/face/u397648.jpg?id=25173731</span>&nbsp;&nbsp;<span class="comment_actions"></span></div>
+			</div>
+			
+			
+		</div>
+	
+
+
+
+<div id="comments_pager_bottom"></div></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#" onclick="return RefreshPage();">刷新页面</a><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank">【推荐】50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a href="http://vcloud.163.com/?adchannel=bp_cnblogs2" target="_blank">【推荐】用1%的研发投入，搭载3倍性能的网易视频云技术</a><br><a href="http://rongcloud.cn/reports/journal2" target="_blank">【推荐】融云发布 App 社交化白皮书 IM 提升活跃超 8 倍</a><br></div>
+<div id="opt_under_post"></div>
+<div id="ad_c1" class="c_ad_block"><a href="http://www.gcpowertools.com.cn/products/spreadjs/?utm_source=cnblogs&amp;utm_medium=blogpage&amp;utm_term=bottom&amp;utm_content=SpreadJS&amp;utm_campaign=community" target="_blank"><img width="300" height="250" src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/24442-20161031104652361-1905759806.gif" alt=""></a></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="http://news.cnblogs.com/n/557200/" target="_blank">中国的院线并购潮开始 会把电影产业带向何方？</a><br> ·  <a href="http://news.cnblogs.com/n/557199/" target="_blank">iOS/Android谷歌相册Google Photos迎更新：更多编辑功能</a><br> ·  <a href="http://news.cnblogs.com/n/557198/" target="_blank">微软用《我的世界》吸引学生走向编程的大门</a><br> ·  <a href="http://news.cnblogs.com/n/557197/" target="_blank">为了把设计图变得更直观 建筑公司也在用VR</a><br> ·  <a href="http://news.cnblogs.com/n/557196/" target="_blank">微软英国Store上调Acer Liquid Jade Primo价格至209.99英镑</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<div id="ad_c2" class="c_ad_block"><a href="https://www.jiguang.cn/devservice/?from=cnblogs01" target="_blank"><img width="468" height="60" src="./linux下IPTABLES配置详解 - 草原和大树 - 博客园_files/24442-20161114133622451-1554357151.jpg" alt=""></a></div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="http://kb.cnblogs.com/page/555750/" target="_blank">循序渐进地代码重构</a><br> ·  <a href="http://kb.cnblogs.com/page/554496/" target="_blank">技术的正宗与野路子</a><br> ·  <a href="http://kb.cnblogs.com/page/553682/" target="_blank">陈皓：什么是工程师文化？</a><br> ·  <a href="http://kb.cnblogs.com/page/551422/" target="_blank">没那么难，谈CSS的设计模式</a><br> ·  <a href="http://kb.cnblogs.com/page/550625/" target="_blank">程序猿媳妇儿注意事项</a><br></div>» <a href="http://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"></div>
+<script type="text/javascript">
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+</div>
+<div id="leftcontent">
+	
+		<div id="leftcontentcontainer">
+			
+<!--done-->
+<div class="newsItem">
+	<div id="blog-news"><p><span style="font-size: 12pt; color: #99cc00; font-family: 楷体_GB2312">草原的信箱：Mr.JemBai#Gmail.com<br>
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #000080">MSN:&nbsp; JemBai#HotMail.Com<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;QQ:&nbsp;&nbsp;&nbsp; <font face="Verdana">478721372</font></span><br>
+</p>
+
+<div id="profile_block">昵称：<a href="http://home.cnblogs.com/u/JemBai/">草原和大树</a><br>园龄：<a href="http://home.cnblogs.com/u/JemBai/" title="入园时间：2008-07-10">8年4个月</a><br>粉丝：<a href="http://home.cnblogs.com/u/JemBai/followers/">325</a><br>关注：<a href="http://home.cnblogs.com/u/JemBai/followees/">0</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="follow(&#39;8945420b-63cf-dd11-9e4d-001cf0cd104b&#39;)">+加关注</a></div></div></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="blog-calendar" style=""><table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar">
+	<tbody><tr><td colspan="7"><table class="CalTitle" cellspacing="0">
+		<tbody><tr><td class="CalNextPrev"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2009/02/01&#39;);return false;">&lt;</a></td><td align="center">2009年3月</td><td class="CalNextPrev" align="right"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2009/04/01&#39;);return false;">&gt;</a></td></tr>
+	</tbody></table></td></tr><tr><th class="CalDayHeader" align="center" abbr="日" scope="col">日</th><th class="CalDayHeader" align="center" abbr="一" scope="col">一</th><th class="CalDayHeader" align="center" abbr="二" scope="col">二</th><th class="CalDayHeader" align="center" abbr="三" scope="col">三</th><th class="CalDayHeader" align="center" abbr="四" scope="col">四</th><th class="CalDayHeader" align="center" abbr="五" scope="col">五</th><th class="CalDayHeader" align="center" abbr="六" scope="col">六</th></tr><tr><td class="CalOtherMonthDay" align="center">22</td><td class="CalOtherMonthDay" align="center">23</td><td class="CalOtherMonthDay" align="center">24</td><td class="CalOtherMonthDay" align="center">25</td><td class="CalOtherMonthDay" align="center">26</td><td class="CalOtherMonthDay" align="center">27</td><td class="CalOtherMonthDay" align="center">28</td></tr><tr><td class="CalWeekendDay" align="center">1</td><td align="center">2</td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/03.html"><u>3</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/04.html"><u>4</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/05.html"><u>5</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/06.html"><u>6</u></a></td><td class="CalWeekendDay" align="center">7</td></tr><tr><td class="CalWeekendDay" align="center">8</td><td align="center">9</td><td align="center">10</td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/11.html"><u>11</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/12.html"><u>12</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/13.html"><u>13</u></a></td><td class="CalWeekendDay" align="center">14</td></tr><tr><td class="CalWeekendDay" align="center">15</td><td align="center">16</td><td align="center">17</td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/18.html"><u>18</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19.html"><u>19</u></a></td><td align="center">20</td><td class="CalWeekendDay" align="center">21</td></tr><tr><td class="CalWeekendDay" align="center">22</td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/23.html"><u>23</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/24.html"><u>24</u></a></td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/25.html"><u>25</u></a></td><td align="center">26</td><td align="center">27</td><td class="CalWeekendDay" align="center">28</td></tr><tr><td class="CalWeekendDay" align="center">29</td><td align="center">30</td><td align="center"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/31.html"><u>31</u></a></td><td class="CalOtherMonthDay" align="center">1</td><td class="CalOtherMonthDay" align="center">2</td><td class="CalOtherMonthDay" align="center">3</td><td class="CalOtherMonthDay" align="center">4</td></tr>
+</tbody></table></div><script type="text/javascript">loadBlogDefaultCalendar();</script><br>
+			<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block">
+<div id="sidebar_search" class="mySearch">
+<h3 class="catListTitle">搜索</h3>
+<div id="sidebar_search_box">
+<div id="widget_my_zzk" class="div_my_zzk"><input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk"></div>
+
+</div>
+</div>
+
+</div><div id="sidebar_shortcut" class="sidebar-block">
+<h3 class="catListTitle">常用链接</h3>
+<ul>
+<li><a href="http://www.cnblogs.com/JemBai/p/" title="我的博客的随笔列表">我的随笔</a></li><li><a href="http://www.cnblogs.com/JemBai/MyComments.html" title="我发表过的评论列表">我的评论</a></li><li><a href="http://www.cnblogs.com/JemBai/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li><li><a href="http://www.cnblogs.com/JemBai/RecentComments.html" title="我的博客的评论列表">最新评论</a></li><li><a href="http://www.cnblogs.com/JemBai/tag/" title="我的博客的标签列表">我的标签</a></li>
+</ul>
+<div id="itemListLin_con" style="display:none;">
+
+</div></div><div id="sidebar_toptags" class="sidebar-block">
+<h3 class="catListTitle">我的标签</h3>
+<div id="MyTag">
+<ul>
+<li><a href="http://www.cnblogs.com/JemBai/tag/Fckeditor/">Fckeditor</a>(4)</li><li><a href="http://www.cnblogs.com/JemBai/tag/struts/">struts</a>(3)</li><li><a href="http://www.cnblogs.com/JemBai/tag/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a>(2)</li><li><a href="http://www.cnblogs.com/JemBai/tag/%E6%8A%95%E7%A5%A8%20%E8%B0%83%E6%9F%A5/">投票 调查</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%94%9F%E6%88%90%E5%B7%A5%E5%85%B7/">正则表达式生成工具</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/AJAX/">AJAX</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/AJAX-XMLhttpRequest/">AJAX-XMLhttpRequest</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/asp.net%20%E6%8E%A7%E4%BB%B6/">asp.net 控件</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/Windows%E6%9C%8D%E5%8A%A1/">Windows服务</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/xml/">xml</a>(1)</li><li><a href="http://www.cnblogs.com/JemBai/tag/">更多</a></li>
+</ul>
+</div></div><div id="sidebar_categories">
+		<h3 class="catListTitle">随笔分类<span style="font-size:11px;font-weight:normal">(866)</span></h3>
+		
+				<ul class="catList">
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_0" class="listitem" href="http://www.cnblogs.com/JemBai/category/144436.html">AJAX（ASP.NET、J2EE）(11)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_1" class="listitem" href="http://www.cnblogs.com/JemBai/category/145764.html">APACHE(4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_2" class="listitem" href="http://www.cnblogs.com/JemBai/category/144437.html">ASP(24)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_3" class="listitem" href="http://www.cnblogs.com/JemBai/category/144378.html">ASP.NET(104)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_4" class="listitem" href="http://www.cnblogs.com/JemBai/category/144403.html">BI（商业智能）</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_5" class="listitem" href="http://www.cnblogs.com/JemBai/category/144379.html">C#(76)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_6" class="listitem" href="http://www.cnblogs.com/JemBai/category/149303.html">CommunityServer（CS）(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_7" class="listitem" href="http://www.cnblogs.com/JemBai/category/144381.html">CSS(6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_8" class="listitem" href="http://www.cnblogs.com/JemBai/category/169988.html">DiscuzNT剖析(大部分都是摘抄)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_9" class="listitem" href="http://www.cnblogs.com/JemBai/category/144382.html">DIV</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_10" class="listitem" href="http://www.cnblogs.com/JemBai/category/149660.html">DOS命令(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_11" class="listitem" href="http://www.cnblogs.com/JemBai/category/149023.html">Excel(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_12" class="listitem" href="http://www.cnblogs.com/JemBai/category/144385.html">Fantasy（泛太西）</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_13" class="listitem" href="http://www.cnblogs.com/JemBai/category/150738.html">FreeBSD(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_14" class="listitem" href="http://www.cnblogs.com/JemBai/category/397826.html">Hadoop(7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_15" class="listitem" href="http://www.cnblogs.com/JemBai/category/144380.html">HTML(34)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_16" class="listitem" href="http://www.cnblogs.com/JemBai/category/144594.html">IDE软件总结(16)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_17" class="listitem" href="http://www.cnblogs.com/JemBai/category/145763.html">IIS(9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_18" class="listitem" href="http://www.cnblogs.com/JemBai/category/144830.html">IT技术上待解决的问题(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_19" class="listitem" href="http://www.cnblogs.com/JemBai/category/144388.html">J2EE(88)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_20" class="listitem" href="http://www.cnblogs.com/JemBai/category/157576.html">J2EE+DOTNET(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_21" class="listitem" href="http://www.cnblogs.com/JemBai/category/144387.html">JS||JQuery||ExtJs||JSON(78)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_22" class="listitem" href="http://www.cnblogs.com/JemBai/category/144384.html">LINUX(102)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_23" class="listitem" href="http://www.cnblogs.com/JemBai/category/147194.html">Lucene(4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_24" class="listitem" href="http://www.cnblogs.com/JemBai/category/144399.html">MSSQL(32)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_25" class="listitem" href="http://www.cnblogs.com/JemBai/category/144398.html">MYSQL(14)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_26" class="listitem" href="http://www.cnblogs.com/JemBai/category/275800.html">Nginx(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_27" class="listitem" href="http://www.cnblogs.com/JemBai/category/149365.html">OOA||OOP及设计模式(3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_28" class="listitem" href="http://www.cnblogs.com/JemBai/category/144401.html">ORACLE(20)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_29" class="listitem" href="http://www.cnblogs.com/JemBai/category/144397.html">PHP(19)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_30" class="listitem" href="http://www.cnblogs.com/JemBai/category/343494.html">RHCE培训(8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_31" class="listitem" href="http://www.cnblogs.com/JemBai/category/144402.html">SAS</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_32" class="listitem" href="http://www.cnblogs.com/JemBai/category/145330.html">SEO(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_33" class="listitem" href="http://www.cnblogs.com/JemBai/category/147292.html">SOA(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_34" class="listitem" href="http://www.cnblogs.com/JemBai/category/144400.html">SPSS</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_35" class="listitem" href="http://www.cnblogs.com/JemBai/category/144405.html">Stock（股票评论）</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_36" class="listitem" href="http://www.cnblogs.com/JemBai/category/145765.html">TOMCAT(5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_37" class="listitem" href="http://www.cnblogs.com/JemBai/category/150334.html">URLReWriter(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_38" class="listitem" href="http://www.cnblogs.com/JemBai/category/144383.html">WINDOWS SERVER(15)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_39" class="listitem" href="http://www.cnblogs.com/JemBai/category/149376.html">XML(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_40" class="listitem" href="http://www.cnblogs.com/JemBai/category/148369.html">ZEND IDE || ZEND FrameWork(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_41" class="listitem" href="http://www.cnblogs.com/JemBai/category/144410.html">安全性，高效性的编码总结</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_42" class="listitem" href="http://www.cnblogs.com/JemBai/category/149304.html">报表开发及使用(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_43" class="listitem" href="http://www.cnblogs.com/JemBai/category/144434.html">财经文摘(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_44" class="listitem" href="http://www.cnblogs.com/JemBai/category/145331.html">成熟的开源系统(4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_45" class="listitem" href="http://www.cnblogs.com/JemBai/category/144435.html">点滴英语(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_46" class="listitem" href="http://www.cnblogs.com/JemBai/category/147197.html">多线程(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_47" class="listitem" href="http://www.cnblogs.com/JemBai/category/307109.html">工作汇总(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_48" class="listitem" href="http://www.cnblogs.com/JemBai/category/373596.html">工作经验总结(3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_49" class="listitem" href="http://www.cnblogs.com/JemBai/category/370767.html">管理科学(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_50" class="listitem" href="http://www.cnblogs.com/JemBai/category/147293.html">好书推荐(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_51" class="listitem" href="http://www.cnblogs.com/JemBai/category/148710.html">华为//CSICO(4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_52" class="listitem" href="http://www.cnblogs.com/JemBai/category/144415.html">黄金评论</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_53" class="listitem" href="http://www.cnblogs.com/JemBai/category/144416.html">基金评论</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_54" class="listitem" href="http://www.cnblogs.com/JemBai/category/292483.html">健康(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_55" class="listitem" href="http://www.cnblogs.com/JemBai/category/144419.html">卡儿、卡儿（Auto\CAR）</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_56" class="listitem" href="http://www.cnblogs.com/JemBai/category/144417.html">期货评论</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_57" class="listitem" href="http://www.cnblogs.com/JemBai/category/144432.html">去旅游</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_58" class="listitem" href="http://www.cnblogs.com/JemBai/category/144407.html">世界经济</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_59" class="listitem" href="http://www.cnblogs.com/JemBai/category/149636.html">视频技术(13)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_60" class="listitem" href="http://www.cnblogs.com/JemBai/category/147196.html">数字证书(5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_61" class="listitem" href="http://www.cnblogs.com/JemBai/category/144408.html">网络安全及网络管理(41)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_62" class="listitem" href="http://www.cnblogs.com/JemBai/category/170645.html">网银(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_63" class="listitem" href="http://www.cnblogs.com/JemBai/category/144389.html">网站测试工具(8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_64" class="listitem" href="http://www.cnblogs.com/JemBai/category/144404.html">网站分类总结(4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_65" class="listitem" href="http://www.cnblogs.com/JemBai/category/149662.html">网站运营(39)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_66" class="listitem" href="http://www.cnblogs.com/JemBai/category/144433.html">武器！武器！</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_67" class="listitem" href="http://www.cnblogs.com/JemBai/category/178873.html">系统供应商(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_68" class="listitem" href="http://www.cnblogs.com/JemBai/category/307847.html">系统集成项目管理(7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_69" class="listitem" href="http://www.cnblogs.com/JemBai/category/197196.html">系统设计(2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_70" class="listitem" href="http://www.cnblogs.com/JemBai/category/297475.html">项目管理(1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_71" class="listitem" href="http://www.cnblogs.com/JemBai/category/144409.html">音乐澡堂(11)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_72" class="listitem" href="http://www.cnblogs.com/JemBai/category/144418.html">银行理财产品评论</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_73" class="listitem" href="http://www.cnblogs.com/JemBai/category/170644.html">硬件(5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_74" class="listitem" href="http://www.cnblogs.com/JemBai/category/148435.html">优秀的小工具(9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_75" class="listitem" href="http://www.cnblogs.com/JemBai/category/144406.html">中国经济之我见</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_0_Link_76" class="listitem" href="http://www.cnblogs.com/JemBai/category/144414.html">中国网站经济随笔</a></li>
+			
+				</ul>
+			
+	
+		<h3 class="catListTitle">随笔档案<span style="font-size:11px;font-weight:normal">(682)</span></h3>
+		
+				<ul class="catList">
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_0" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/11.html">2012年11月 (5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_1" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/10.html">2012年10月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_2" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/09.html">2012年9月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_3" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/08.html">2012年8月 (10)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_4" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/07.html">2012年7月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_5" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/06.html">2012年6月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_6" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/05.html">2012年5月 (9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_7" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/04.html">2012年4月 (21)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_8" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/03.html">2012年3月 (10)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_9" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/02.html">2012年2月 (5)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_10" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2012/01.html">2012年1月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_11" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/12.html">2011年12月 (9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_12" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/11.html">2011年11月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_13" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/10.html">2011年10月 (8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_14" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/09.html">2011年9月 (3)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_15" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/08.html">2011年8月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_16" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/07.html">2011年7月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_17" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/06.html">2011年6月 (19)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_18" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/05.html">2011年5月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_19" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/04.html">2011年4月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_20" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/03.html">2011年3月 (16)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_21" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/02.html">2011年2月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_22" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2011/01.html">2011年1月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_23" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/12.html">2010年12月 (16)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_24" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/11.html">2010年11月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_25" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/10.html">2010年10月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_26" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/09.html">2010年9月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_27" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/08.html">2010年8月 (9)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_28" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/07.html">2010年7月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_29" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/06.html">2010年6月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_30" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/05.html">2010年5月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_31" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/04.html">2010年4月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_32" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/03.html">2010年3月 (7)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_33" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/02.html">2010年2月 (2)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_34" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2010/01.html">2010年1月 (11)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_35" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/12.html">2009年12月 (20)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_36" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/11.html">2009年11月 (18)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_37" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/10.html">2009年10月 (13)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_38" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/09.html">2009年9月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_39" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/08.html">2009年8月 (8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_40" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/07.html">2009年7月 (4)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_41" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/06.html">2009年6月 (1)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_42" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/05.html">2009年5月 (6)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_43" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/04.html">2009年4月 (23)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_44" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/03.html">2009年3月 (29)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_45" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/02.html">2009年2月 (12)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_46" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2009/01.html">2009年1月 (12)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_47" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2008/12.html">2008年12月 (48)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_48" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2008/11.html">2008年11月 (8)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_49" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2008/10.html">2008年10月 (27)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_50" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2008/09.html">2008年9月 (51)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_51" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2008/08.html">2008年8月 (101)</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_1_Link_52" class="listitem" href="http://www.cnblogs.com/JemBai/archive/2008/07.html">2008年7月 (69)</a></li>
+			
+				</ul>
+			
+	
+		<h3 class="catListTitle">老师的网址</h3>
+		
+				<ul class="catList">
+			
+				<li class="catListItem"> <a id="CatList_LinkList_2_Link_0" class="listitem" href="http://www.enmou.com/" rel="nofollow" target="_blank">Oracle</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_2_Link_1" class="listitem" href="http://chu888chu888.cnblogs.com/" rel="nofollow">楚广明老师的主页</a></li>
+			
+				</ul>
+			
+	
+		<h3 class="catListTitle">我的朋友</h3>
+		
+				<ul class="catList">
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_0" class="listitem" href="http://www.ajaxjs.com/" rel="nofollow">AJAXJS</a></li>
+			<li class="c_b_p_link_desc">AJAX解决方案，很有用。</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_1" class="listitem" href="http://clingingboy.cnblogs.com/" rel="nofollow">ASP.NET控件</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_2" class="listitem" href="http://www.cnblogs.com/huangjianhuakarl/" rel="nofollow">ASP.NET控件</a></li>
+			<li class="c_b_p_link_desc">ASP.NET控件</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_3" class="listitem" href="http://www.cnblogs.com/daizhj/category/116704.html">DiscuzNT高人</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_4" class="listitem" href="http://www.dojochina.com/" rel="nofollow">DOJO中国</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_5" class="listitem" href="http://www.63cm.cn/" rel="nofollow" target="_blank">J2EE 个人BLOG</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_6" class="listitem" href="http://www.cnblogs.com/jillzhang/" rel="nofollow">Jinllzhang【牛人】</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_7" class="listitem" href="http://www.cnblogs.com/liqiang665/" rel="nofollow">liqiang665</a></li>
+			<li class="c_b_p_link_desc">实在，常看</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_8" class="listitem" href="http://www.cnblogs.com/lxinxuan/" rel="nofollow">lxinxuan's Blog</a></li>
+			<li class="c_b_p_link_desc">跟我有同样习惯的同志</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_9" class="listitem" href="http://www.cnblogs.com/mrhgw/" rel="nofollow">NET开发工具</a></li>
+			<li class="c_b_p_link_desc">NET开发工具</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_10" class="listitem" href="http://space.itpub.net/23594852/spacelist-blog" rel="nofollow" target="_blank">Oracle学习笔记</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_11" class="listitem" href="http://webabcd.cnblogs.com/" rel="nofollow">WebABCD</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_12" class="listitem" href="http://www.cnblogs.com/freshman0216/" rel="nofollow">陈晨的博客</a></li>
+			<li class="c_b_p_link_desc">由于陈晨同志长期对本人博客的关注和留言。特此把陈晨同志的博客收藏。</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_13" class="listitem" href="http://www.cnblogs.com/dingxue/" rel="nofollow">丁学的博客</a></li>
+			<li class="c_b_p_link_desc">谢谢丁学对本博客的支持。</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_14" class="listitem" href="http://blog.csdn.net/21aspnet/" rel="nofollow">黄鸣</a></li>
+			<li class="c_b_p_link_desc">专注ASP.NET，常看。</li>
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_15" class="listitem" href="http://www.izzj.com/blog/" rel="nofollow">梦天糖（做网站推广地）</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_16" class="listitem" href="http://learning.artech.cn/" rel="nofollow">前沿视频教室</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_17" class="listitem" href="http://www.cnblogs.com/iuhxq/" rel="nofollow">小灰【另类】</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_18" class="listitem" href="http://www.cnblogs.com/qianxudetianxia/" rel="nofollow">虚心的天下【ExtJs】</a></li>
+			
+				<li class="catListItem"> <a id="CatList_LinkList_3_Link_19" class="listitem" href="http://www.xuyibo.org/" rel="nofollow">徐艺波</a></li>
+			
+				</ul>
+			
+	
+</div><div id="sidebar_scorerank" class="sidebar-block">
+<h3>积分与排名</h3>
+<ul>
+	<li>
+		积分 -
+		363146
+	</li><li>
+		排名 -
+		339
+	</li>
+</ul>
+</div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap">
+<h3 class="catListTitle">最新评论</h3>
+<div class="RecentComment" id="RecentComments">
+	<div id="RecentCommentsBlock"><ul>
+        <li class="recent_comment_title"><a href="http://www.cnblogs.com/JemBai/archive/2012/11/28/2792761.html#3526559">1. Re:检查Linux服务器网卡驱动版本与更新</a></li>
+        <li class="recent_comment_body">不错挺好，文中的附件，在那块</li>
+        <li class="recent_comment_author">--李天书</li>
+        <li class="recent_comment_title"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3495051">2. Re:linux下IPTABLES配置详解</a></li>
+        <li class="recent_comment_body">楼主特意登录   评论，希望能够转发</li>
+        <li class="recent_comment_author">--AnyYoung</li>
+        <li class="recent_comment_title"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3478617">3. Re:linux下IPTABLES配置详解</a></li>
+        <li class="recent_comment_body">@秋日落忆也太新手了，看完理解了再操作呀！ O(∩_∩)O 无法远程，机器如果在机房，你顺便又不是IT，就惨咯~~~...</li>
+        <li class="recent_comment_author">--小侠女</li>
+        <li class="recent_comment_title"><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html#3478615">4. Re:linux下IPTABLES配置详解</a></li>
+        <li class="recent_comment_body">@银角大王你理解的不对，楼主说如果设置的是drop， 就要单独开你要用的端口。如果你设置了drop后，可能就立刻无法远程了，直接去机器上accept 22 端口后，才能继续远程。...</li>
+        <li class="recent_comment_author">--小侠女</li>
+        <li class="recent_comment_title"><a href="http://www.cnblogs.com/JemBai/archive/2010/12/31/1923339.html#3472202">5. Re:关于BeanUtils中copyProperties方法的研究体会 (转)</a></li>
+        <li class="recent_comment_body">搞错，你这是Struts，我那是spring</li>
+        <li class="recent_comment_author">--逝幕的年华</li>
+</ul>
+</div>
+</div>
+</div></div><div id="sidebar_topviewedposts" class="sidebar-block"><div id="topview_posts_wrap">
+<h3 class="catListTitle">阅读排行榜</h3>
+<div class="RecentComment" id="TopViewPosts"> 
+	<div id="TopViewPostsBlock"><ul><li><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html">1. linux下IPTABLES配置详解(376514)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/02/05/1384413.html">2. Linux VSFTP服务器详细配置(113840)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/10/27/1590689.html">3. MySQL 管理工具：Navicat for MySQL 8.0.19 中文版(破解版)(93945)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/01/13/1374805.html">4. Debug和Release区别(92586)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/08/20/1550683.html">5. Java数据类型和MySql数据类型对应表(89326)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+<h3 class="catListTitle">评论排行榜</h3>
+<div class="RecentComment" id="TopCommentsPosts">
+	<div id="TopFeedbackPostsBlock"><ul><li><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html">1. linux下IPTABLES配置详解(44)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2008/07/31/1257044.html">2. mdcsoft服务器网络安全解决方案-SQL注入解决(12)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2008/08/02/1258927.html">3. power2go 6.0 注册码(7)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2008/08/02/1258716.html">4. PHP开发工具资源(6)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/02/14/1390513.html">5. 使用cookie制作购物车(6)</a></li></ul></div>
+</div></div></div><div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+<h3 class="catListTitle">推荐排行榜</h3>
+<div class="RecentComment">
+	<div id="TopDiggPostsBlock"><ul><li><a href="http://www.cnblogs.com/JemBai/archive/2009/03/19/1416364.html">1. linux下IPTABLES配置详解(45)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2008/09/02/1281864.html">2. DbHelper数据操作类【DBHelper.CS】【转：http://www.cnblogs.com/fanrong/articles/726526.html】(16)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/01/13/1374805.html">3. Debug和Release区别(16)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2009/08/20/1550683.html">4. Java数据类型和MySql数据类型对应表(6)</a></li><li><a href="http://www.cnblogs.com/JemBai/archive/2010/01/06/1640636.html">5. Hibernate中Criteria的完整用法(4)</a></li></ul></div>
+</div></div></div></div><script type="text/javascript">loadBlogSideColumn();</script></div>
+	
+</div>
+
+<!--done-->
+<div class="footer">
+	Powered by: <a href="http://www.cnblogs.com/">博客园</a>	模板提供：<a href="http://blog.hjenglish.com/">沪江博客</a>
+	Copyright ©2016 草原和大树
+</div>
+
+
+
+
+
+</body></html>

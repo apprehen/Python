@@ -1,0 +1,6 @@
+GET /news/important_26447?page=4&year=2019&month= HTTP/1.0
+Host: www.hdu.edu.cn
+
+
+GET /uploads/news/images/20190910/1568103422209579.jpg HTTP/1.0
+Host: www.hdu.edu.cn

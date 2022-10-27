@@ -124,10 +124,11 @@ def main(page):
                 os.mkdir(path_3)
             detail_index_more(detail_html, name, path_3)
         print('*'*10, f'{name}下载完毕！', '*'*10)
+    print("图片下载完成辣，谢谢使用！！")
 
 ## 主程序入口
 if __name__ == '__main__':
-    pages = list(range(1, 11))
+    pages = list(range(1, 15))
     # 使用多线程进行加速
     with ThreadPoolExecutor(max_workers=5) as executor:
         executor.map(main, pages)

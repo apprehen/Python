@@ -47,13 +47,13 @@ def __init():
 # 创建下载文件路径
 def creatpath(mode,today):
   today = str(today)
-  path = f'D:/pixiv_image{mode}/'
+  path = f'D:/pixiv_image_{mode}/'
   if not os.path.exists(path):
     os.mkdir(path)
     return path
   print(f"here {path}")
   return path
-  path_2 = f'D:/pixiv_image{mode}{today}'
+  path_2 = f'D:/pixiv_image_{mode}_{today}'
   if not os.path.exists(path_2):
     os.mkdir(path_2)
     return path_2
@@ -80,14 +80,15 @@ def scape(mode,today):
   root = creatpath(mode,today)
   flag = 0
   for herf in child_url_list:
-    if (flag>10):
+    if (flag>50):
+      print("图片爬取完成辣(一次五十张不能贪多噢) 谢谢使用!!")
       break
     final = requests.get(herf,headers=ua_random())
     real_image_url = obj1.search(final.text)
-    print(real_image_url)
+    # print(real_image_url)
     DL_URL=real_image_url.group()
-    print(DL_URL)
-    print(f"type of root is {type(root)},type of DL_URL is {type(DL_URL)}")
+    # print(DL_URL)
+    # print(f"type of root is {type(root)},type of DL_URL is {type(DL_URL)}")
     path_img = root + str(DL_URL).split('/')[-1]
     pic = requests.get(DL_URL.split('"')[-2], headers=headers, verify=False, timeout=5)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -96,6 +97,7 @@ def scape(mode,today):
     image.save(f"{path_img.split('.')[-2]}.png", "png")
     print("SUCCESS!")
     flag = flag + 1
+    time.sleep(2)
 
 # 主程序入口
 if __name__ == '__main__':

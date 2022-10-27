@@ -15,7 +15,7 @@ today = datetime.date.today()
 # 获取昨天的日期，并用于构建url
 today_str = (datetime.date.today() + datetime.timedelta(days=-1)).strftime('%Y%m%d')
 
-mark = int(input("请选择要下载的榜单(0--每日榜单，1--每周榜单，2--每月榜单)"))
+mark = int(input("请选择要下载的榜单\n0---每日榜单\n1---每周榜单\n2---每月榜单\n"))
 mode = ''
 if (mark == 0):
     mode = 'daily'
@@ -25,8 +25,8 @@ elif mark == 2:
     mode = 'monthly'
 else:
     print("输入有误，即将退出程序")
-    os._exit()
-# 分布创建属于当日榜单的文件夹
+    os._exit(0)
+# 分布创建属于榜单的文件夹
 path_1 = f'D:/vilipix{mode}榜单'
 if not os.path.exists(path_1):
     os.mkdir(path_1)
@@ -59,6 +59,7 @@ def scrap_index(page):
     '''
     base_url:https://www.vilipix.com
     today_str:获取当天网站榜单日期
+    mode: 日 周 月
     page:榜单页码
     '''
     return scrap_page(url)

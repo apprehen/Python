@@ -51,8 +51,7 @@ def creatpath(mode,today):
   if not os.path.exists(path):
     os.mkdir(path)
     return path
-  print(f"here {path}")
-  return path
+  # return path
   path_2 = f'D:/pixiv_image_{mode}_{today}'
   if not os.path.exists(path_2):
     os.mkdir(path_2)

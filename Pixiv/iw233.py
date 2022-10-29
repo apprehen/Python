@@ -1,4 +1,3 @@
-from cgitb import reset
 import requests
 import os
 import base64
@@ -49,7 +48,7 @@ def spider(url,img_name,mode):
     os.mkdir(path)
   # 写成循环形式
   while 1:
-    if i > 68:
+    if i > 75:
       break
     response = requests.get(url = url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"})
     image = Image.open(BytesIO(response.content))

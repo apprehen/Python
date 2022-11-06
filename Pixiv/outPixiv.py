@@ -92,6 +92,10 @@ def scape(mode,today):
     flag = flag + 1
     time.sleep(1)
 
+def test():
+  print("111")
+
+
 # 主程序入口
 if __name__ == '__main__':
   # 获取当前时间

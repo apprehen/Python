@@ -9,10 +9,10 @@ from fake_useragent import UserAgent
 import random
 import urllib3
 import datetime
-
+import fake_useragent
 # 设置随机请求头
 ua = UserAgent(verify_ssl=False, path='./fake_useragent0.1.11.json')
-
+print(fake_useragent.VERSION)
 # 请求随机头
 def ua_random():
   headers = {
@@ -46,12 +46,11 @@ def __init():
 
 # 创建下载文件路径
 def creatpath(mode,today):
-  today = str(today)
   path = f'D:/pixiv_image_{mode}/'
+  path_2 = f'D:/pixiv_image_{mode}_{today}'
   if not os.path.exists(path):
     os.mkdir(path)
     return path
-  path_2 = f'D:/pixiv_image_{mode}_{today}'
   if not os.path.exists(path_2):
     os.mkdir(path_2)
     return path_2
@@ -65,6 +64,7 @@ def scape(mode,today):
   # 找到img属性的 href 并爬取 
   obj=re.compile(r"<div class=\"ranking-image-item\"><a href=\"(?P<image_URL>.*?)\"class",re.S)
   results = obj.finditer(resp.text)
+  resp.close()
   # 将获取的href 放入数组中
   for result in results:
     list = result.group('image_URL')
@@ -81,6 +81,7 @@ def scape(mode,today):
       break
     final = requests.get(herf,headers=ua_random())
     real_image_url = obj1.search(final.text)
+    final.close()
     DL_URL=real_image_url.group()
     path_img = root + str(DL_URL).split('/')[-1]
     pic = requests.get(DL_URL.split('"')[-2], headers=headers, verify=False, timeout=5)
@@ -90,7 +91,7 @@ def scape(mode,today):
     image.save(f"{path_img.split('.')[-2]}.png", "png")
     print("SUCCESS!")
     flag = flag + 1
-    time.sleep(1)
+    time.sleep(3)
 
 # 主程序入口
 if __name__ == '__main__':

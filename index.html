@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #page-header.not-home-page{
+      height: 500px;
+      width: 80%;
+      /* background: url(); */
+      overflow: hidden;
+      /* background-position: center center;
+      background-size: cover;
+      background: ; */
+      /* background: url() no-repeat center center cover; */
+      background-position: center center !important;
+      background-repeat: no-repeat !important;
+      background-size: cover !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="not-home-page" id="page-header"></div>
+
+</body>
+  <script>
+    async function myrandom (length) {
+      const result = await Math.floor(Math.random() * (length))
+      return result
+    }
+    async function urls () {
+      const backgrounds = [
+      'https://cdn.staticaly.com/gh/apprehen/pciture@master/102629230_p0.3yd2fxgj0100.webp',
+      'https://cdn.staticaly.com/gh/apprehen/pciture@master/2022_11_14_18_13_8.1suw5slc2alc.webp',
+      'https://cdn.staticaly.com/gh/apprehen/pciture@master/2022_11_14_18_13_69.48zazf9gxx60.webp'
+      ]
+      const index = await myrandom(backgrounds.length)
+      const result = backgrounds[index]
+      return result
+    }
+    async function xiugai () {
+      const op = document.querySelector("#page-header.not-home-page")
+      const url = await urls()
+      op.style.backgroundImage = await `url(${url})`
+    }
+    ;(async()=>{
+      await xiugai()
+    })()
+  </script>
+</html>

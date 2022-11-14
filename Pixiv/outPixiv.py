@@ -47,7 +47,7 @@ def __init():
 # 创建下载文件路径
 def creatpath(mode,today):
   path = f'D:/pixiv_image_{mode}/'
-  path_2 = f'D:/pixiv_image_{mode}_{today}'
+  path_2 = f'D:/pixiv_image_{mode}_{today}/'
   if not os.path.exists(path):
     os.mkdir(path)
     return path
@@ -72,30 +72,30 @@ def scape(mode,today):
     child_url_list.append(child_url)
   # 获取原图片
   obj1 = re.compile(r"\"original\":\"(?P<download_URL>.*?)\"")
-  # 注意 headers 应该从之前的网页进去
-  headers = {'Referer':'https://www.pixiv.net/'}
+  # 注意 headers 应该从之前的网页进去 请求报文的格式
+  headers = {'Referer':'https://www.pixiv.net/','use_agent': ua.random}
   root = creatpath(mode,today)
   flag = 0
   for herf in child_url_list:
     if (flag>52):
       break
-    final = requests.get(herf,headers=ua_random())
-    real_image_url = obj1.search(final.text)
-    final.close()
-    DL_URL=real_image_url.group()
-    path_img = root + str(DL_URL).split('/')[-1]
-    pic = requests.get(DL_URL.split('"')[-2], headers=headers, verify=False, timeout=5)
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    # 储存在文件夹中
-    image = Image.open(BytesIO(pic.content))
-    image.save(f"{path_img.split('.')[-2]}.png", "png")
-    print("SUCCESS!")
+    try:
+      final = requests.get(herf,headers=headers)
+      real_image_url = obj1.search(final.text)
+      final.close()
+      DL_URL=real_image_url.group()
+      path_img = root + str(DL_URL).split('/')[-1]
+      pic = requests.get(DL_URL.split('"')[-2], headers=headers, verify=False, timeout=5)
+      urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+      # 储存在文件夹中
+      image = Image.open(BytesIO(pic.content))
+      pic.close()
+      image.save(f"{path_img.split('.')[-2]}.png", "png")
+      print("SUCCESS!")
+    except:
+      print("下载出错辣")
     flag = flag + 1
     time.sleep(3)
-
-def test():
-  print("111")
-
 
 # 主程序入口
 if __name__ == '__main__':

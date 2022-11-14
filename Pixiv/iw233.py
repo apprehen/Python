@@ -50,10 +50,14 @@ def spider(url,img_name,mode):
   while 1:
     if i > 75:
       break
-    response = requests.get(url = url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"})
-    image = Image.open(BytesIO(response.content))
-    image.save(f"{path}/{img_name}_{i}.jpg")
-    print("SUCCESS!")
+    # 使用异常处理防止因为一个图片而导致整个程序崩掉
+    try:
+      response = requests.get(url = url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"})
+      image = Image.open(BytesIO(response.content))
+      image.save(f"{path}/{img_name}_{i}.jpg")
+      print("SUCCESS!")
+    except:
+      print("出错辣")
     i = i + 1
 
 if __name__ == '__main__':
@@ -64,3 +68,4 @@ if __name__ == '__main__':
   urls = ['https://iw233.cn/api.php','http://api.iw233.cn/api.php','https://dev.iw233.cn/api.php','http://ap1.iw233.cn/api.php']
   url = get_url(urls,mode)
   spider(url,img_name,mode)
+  print("爬取完辣，谢谢使用，请勿用来商用")

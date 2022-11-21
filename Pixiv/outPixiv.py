@@ -1,12 +1,11 @@
 from io import BytesIO
-from typing import final
 import requests
 import re
 import os
 from PIL import Image
 import time
 from fake_useragent import UserAgent
-import random
+import random   
 import urllib3
 import datetime
 import fake_useragent
@@ -68,25 +67,22 @@ def scape(mode,today):
   # 将获取的href 放入数组中
   for result in results:
     list = result.group('image_URL')
-    child_url=father+list.strip("/")
+    child_url=father+list.strip("/")  
     child_url_list.append(child_url)
   # 获取原图片
   obj1 = re.compile(r"\"original\":\"(?P<download_URL>.*?)\"")
   # 注意 headers 应该从之前的网页进去 请求报文的格式
-  headers = {'Referer':'https://www.pixiv.net/','use_agent': ua.random}
   root = creatpath(mode,today)
-  flag = 0
   for herf in child_url_list:
-    if (flag>52):
-      break
+    headers = {'Referer':'https://www.pixiv.net/','use_agent': ua.random}
     try:
       final = requests.get(herf,headers=headers)
       real_image_url = obj1.search(final.text)
       final.close()
       DL_URL=real_image_url.group()
       path_img = root + str(DL_URL).split('/')[-1]
-      pic = requests.get(DL_URL.split('"')[-2], headers=headers, verify=False, timeout=5)
       urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+      pic = requests.get(DL_URL.split('"')[-2], headers=headers, verify=False, timeout=5)
       # 储存在文件夹中
       image = Image.open(BytesIO(pic.content))
       pic.close()
@@ -94,8 +90,7 @@ def scape(mode,today):
       print("SUCCESS!")
     except:
       print("下载出错辣")
-    flag = flag + 1
-    time.sleep(3)
+    time.sleep(random.randint(3,8))
 
 # 主程序入口
 if __name__ == '__main__':
@@ -105,4 +100,5 @@ if __name__ == '__main__':
   mode = __init()
   # 进入程序
   scape(mode,today)
+  print("下载完成辣")
 
